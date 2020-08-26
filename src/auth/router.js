@@ -6,7 +6,9 @@ const express = require('express');
 
 const router = express.Router();
 
-const auth = require('./middleware/basic');
+const basicAuth = require('./middleware/basic');
+
+const oAuth = require('./middleware/oAuth');
 
 const users = require('./models/users-model');
 
@@ -20,14 +22,13 @@ const handleSignUp = async (req, res, next)=>{
   let user = new users(req.body);
   let valid = await users.findOne({username: user.username});
   // let valid = users.validation(user.username);
-  console.log('valid: ', valid );
   if(!valid){
 
     try{
 
       let savedUser = await user.save();
 
-      let token = savedUser.tokenGenerator(savedUser);
+      let token = savedUser.tokenGenerator();
 
       res.status(200).send(token);
     } catch (error) {
@@ -46,10 +47,13 @@ function handleSignin(req, res, next){
 }
 
 router.post('/signup', handleSignUp);
-router.post('/signin', auth, handleSignin);
+router.post('/signin', basicAuth, handleSignin);
 router.get('/users',(req,res)=>{
   users.find({})
     .then(results => res.json(results));
+});
+router.get('/oauth', oAuth, (req, res)=>{
+  res.status(200).send(req.token);
 });
 
 
