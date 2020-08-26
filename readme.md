@@ -6,6 +6,8 @@ The whole process will split into 4 phases:
 
 [Click here to see the phase 1 docs](phase_docs/phase_1.md);
 
+[Click here to see the phase 2 docs](phase_docs/phase_2.md);
+
 ## Business Requirements
 
 Our business is expanding! We have a real need to manage a list of users of many types, and control their access to our data accordingly. The system to be built will have the following core features:

@@ -5,7 +5,7 @@ const app = express();
 // const AuthBase = require('./auth/middleware/basic');
 
 // const users = require('./auth/models/users-model');
-
+app.use(express.static('./public'));
 app.use(express.json());
 
 const router = require('./auth/router');
