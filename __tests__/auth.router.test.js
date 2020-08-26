@@ -20,7 +20,7 @@ describe('Auth Router', () => {
 
       const results = await mockRequest.post('/signup').send(userData);
 
-      const token = jwt.verify(results.text, process.env.SECRET);
+      const token = await jwt.verify(results.text, process.env.SECRET);
 
       expect(token.id).toBeDefined();
       // expect(results.text).toBe('a');

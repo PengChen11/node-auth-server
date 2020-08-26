@@ -11,28 +11,28 @@ const users = new mongoose.Schema({
   role: { type: String, required: true, default: 'user', enum: ['admin', 'editor', 'user']},
 });
 
-users.pre('save', async ()=>{
+users.pre('save', async function(){
   if (this.isModified('password')){
-
-    this.password = await bcrypt.hash(this.password, 10);
+    this.password = await bcrypt.hash(this.password, 5);
   }
 });
 
-users.statics.authenticateBssic = (username, password) =>{
+
+users.statics.authenticateBasic = function(username, password) {
   let query = { username };
   return this.findOne(query)
     .then( user => user && user.comparePassword(password))
-    .catch(console.error);
+    .catch(err=>console.error(err));
 };
 
 
-users.method.comparePassword = (plainPassword) =>{
+users.methods.comparePassword = function(plainPassword) {
   return bcrypt.compare(plainPassword, this.password)
     .then(valid => valid ? this : null)
-    .catch(console.error);
+    .catch(err=>console.error(err));
 };
 
-users.method.tokenGenerator = () =>{
+users.methods.tokenGenerator = function(){
   let tokenData = {
     id: this._id,
   };
@@ -42,4 +42,13 @@ users.method.tokenGenerator = () =>{
   return signed;
 };
 
+users.methods.validation = function(username) {
+  let query = { username };
+  console.log('validation this is: ', this);
+  return this.findOne(query);
+  // return result;
+};
+
+
 module.exports = mongoose.model('users', users);
+

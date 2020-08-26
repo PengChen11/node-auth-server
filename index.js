@@ -14,6 +14,8 @@ const mongooseOptions = {
   useUnifiedTopology: true,
 };
 
-mongoose.connect(MONGODB_URL, mongooseOptions);
+mongoose.connect(MONGODB_URL, mongooseOptions)
+  .then(console.log('connected to db'))
+  .catch(e=>console.error(e));
 
 server.start();

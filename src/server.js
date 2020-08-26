@@ -2,14 +2,13 @@
 const  express = require('express');
 const app = express();
 
-const AuthBase = require('./auth/middleware/auth');
+// const AuthBase = require('./auth/middleware/basic');
 
-const users = require('./auth/models/users-model');
+// const users = require('./auth/models/users-model');
 
 app.use(express.json());
 
 const router = require('./auth/router');
-
 
 app.use(router);
 

@@ -6,47 +6,37 @@ const express = require('express');
 
 const router = express.Router();
 
-const auth = require('./middleware/auth');
+const auth = require('./middleware/basic');
 
 const users = require('./models/users-model');
 
-const bcrypt = require('bcrypt');
+// const bcrypt = require('bcrypt');
 
-const jwt = require('jsonwebtoken');
+// const jwt = require('jsonwebtoken');
 
-const SECRET = process.env.SECRET;
+// const SECRET = process.env.SECRET;
 
 const handleSignUp = async (req, res, next)=>{
-  let user = req.body;
-  if(!users[user.username]){
-    user.password = await bcrypt.hash(req.body.password, 10);
+  let user = new users(req.body);
+  let valid = await users.findOne({username: user.username});
+  // let valid = users.validation(user.username);
+  console.log('valid: ', valid );
+  if(!valid){
 
-    users[user.username]=user;
+    try{
 
-    let token = await jwt.sign({username: user.username}, SECRET);
+      let savedUser = await user.save();
 
-    res.status(200).send(token);
+      let token = savedUser.tokenGenerator(savedUser);
+
+      res.status(200).send(token);
+    } catch (error) {
+      console.error(error);
+    }
   } else {
     res.status(403).send('Username taken, please choose another one');
   }
 };
-
-
-router.post('/signup', handleSignUp);
-router.post('/signin', auth, handleSignin);
-
-// function handleSignup (req, res, next) {
-//   // create nw user
-//   //save it
-//   //response ???
-//   const user = new users(req.body);
-//   user.save()
-//     .then(user => {
-//       let token = users.generateToken(user);
-//       res.status(200).send(token);
-//     })
-//     .catch(e => { res.status(403).send('Error Creating User'); });
-// }
 
 
 
@@ -54,5 +44,13 @@ function handleSignin(req, res, next){
   res.cookie('auth', req.token);
   res.send(req.token);
 }
+
+router.post('/signup', handleSignUp);
+router.post('/signin', auth, handleSignin);
+router.get('/users',(req,res)=>{
+  users.find({})
+    .then(results => res.json(results));
+});
+
 
 module.exports = router;
