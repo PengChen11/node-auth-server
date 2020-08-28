@@ -12,11 +12,7 @@ const oAuth = require('./middleware/oAuth');
 
 const users = require('./models/users-model');
 
-// const bcrypt = require('bcrypt');
-
-// const jwt = require('jsonwebtoken');
-
-// const SECRET = process.env.SECRET;
+const bearerAuth = require('./middleware/bearer');
 
 const handleSignUp = async (req, res, next)=>{
   let user = new users(req.body);
@@ -48,12 +44,16 @@ function handleSignin(req, res, next){
 
 router.post('/signup', handleSignUp);
 router.post('/signin', basicAuth, handleSignin);
-router.get('/users',(req,res)=>{
-  users.find({})
-    .then(results => res.json(results));
-});
+// router.get('/users',(req,res)=>{
+//   users.find({})
+//     .then(results => res.json(results));
+// });
 router.get('/oauth', oAuth, (req, res)=>{
   res.status(200).send(req.token);
+});
+
+router.get('/user', bearerAuth, (req, res) => {
+  res.status(200).json(req.user);
 });
 
 
