@@ -1,0 +1,88 @@
+'use strict';
+
+require('dotenv').config();
+require('@code-fellows/supergoose');
+const jwt = require('jsonwebtoken');
+const User = require('../src/auth/models/users-model-class');
+
+afterEach(async () => {
+  await User.schema.deleteMany({});
+});
+
+const fakeUser = {
+  username: 'janedoe',
+  password: 'password',
+  role: 'admin',
+  email: 'jane@doe.com',
+};
+
+describe.skip('testing for user model class',()=>{
+
+  it('should save hashed password', async () => {
+    // const user = await User.create(fakeUser).save();
+    const user = await User.create(fakeUser);
+    expect(user.username).toBe(fakeUser.username);
+    expect(user.password).not.toBe(fakeUser.password);
+  });
+
+  it('should authenticate known user', async () => {
+    const user = await User.create(fakeUser);
+    // expect(user.authenticateBasic()).toBe(1);
+    const authenticatedUser = await user.authenticateBasic(fakeUser.username, fakeUser.password );
+    expect(authenticatedUser).toBeDefined();
+  });
+
+  it('should get null for  unknown user', async () => {
+    const authenticatedUser = await User.authenticateBasic('nobody', 'unknown' );
+    expect(authenticatedUser).toBeNull();
+  });
+
+  it('should return user when password good', async () => {
+    const user = await User.create(fakeUser);
+    const comparedUser = await user.comparePassword(fakeUser.password);
+    expect(user).toBe(comparedUser);
+  });
+
+  it('should return null when password bad', async () => {
+    const user = await User.create(fakeUser);
+    const comparedUser = await user.comparePassword('wrongpassword');
+    expect(comparedUser).toBeNull();
+  });
+
+  it.skip('should generate a token', async () => {
+    const user = await User.create(fakeUser);
+    const token = user.generateToken();
+    expect(token).toBeDefined();
+    const verifiedToken = jwt.verify(token, process.env.JWT_SECRET);
+    expect(verifiedToken.role).toBe(user.role);
+  });
+
+  it('creating an existing user returns user', async () => {
+
+    const user = await User.create(fakeUser);
+
+    const foundOrCreated = await User.createFromOauth(user.email);
+
+    expect(foundOrCreated.email).toBe(user.email);
+    expect(foundOrCreated.password).toBe(user.password);
+
+  });
+
+  it('creating with email returns User.create', async () => {
+
+    const foundOrCreated = await User.createFromOauth('new@new.com');
+
+    expect(foundOrCreated.email).toBe('new@new.com');
+
+    expect(foundOrCreated.password).not.toBe('none');
+
+  });
+
+  it('creating with missing email is an error', async () => {
+
+    expect.assertions(1);
+
+    await expect(User.createFromOauth()).rejects.toEqual('Validation Error');
+
+  });
+});

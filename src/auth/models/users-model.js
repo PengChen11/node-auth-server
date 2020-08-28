@@ -3,11 +3,12 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const isEmail = require('validator').isEmail;
 
 const users = new mongoose.Schema({
   username: { type: String, requried: true, unique: true},
   password: { type: String, required: true},
-  email: {type: String},
+  email: {type: String, validate: [ isEmail, 'invalid email' ]},
   role: { type: String, required: true, default: 'user', enum: ['admin', 'editor', 'user']},
 });
 
@@ -35,6 +36,8 @@ users.methods.comparePassword = function(plainPassword) {
 users.methods.tokenGenerator = function(){
   let tokenData = {
     id: this._id,
+    username: this.username,
+    role: this.role,
   };
 
   const signed = jwt.sign(tokenData, process.env.SECRET);
@@ -48,6 +51,46 @@ users.methods.validation = function(username) {
   return this.findOne(query);
   // return result;
 };
+
+
+users.statics.createFromOauth = async function(email){
+
+  if(!email){
+    return Promise.reject('Validation Error');
+  }
+
+  let query = { email };
+  let findUser = await this.findOne(query);
+  if(!findUser){
+    try {
+      return this.create({username:email, password:'none', email:email});
+    }
+    catch (error){
+      return error;
+    }
+  }
+  return findUser;
+};
+
+users.statics.authenticateToken = function (token) {
+
+  /* Additional Security Measure */
+  // if (usedTokens.has(token)) {
+  //   return Promise.reject('Invalid Token');
+  // }
+
+  let parsedToken = jwt.verify(token, process.env.SECRET);
+
+  /* Additional Security Measure */
+  // Add to the scrap heap if we are in "one use token mode"
+  // if(SINGLE_USE_TOKENS) {
+  //   usedTokens.add(token);
+  // }
+
+  return this.findById(parsedToken.id);
+
+};
+
 
 
 module.exports = mongoose.model('users', users);
