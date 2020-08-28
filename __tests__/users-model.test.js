@@ -81,3 +81,20 @@ it('creating with missing email is an error', async () => {
   await expect(User.createFromOauth()).rejects.toEqual('Validation Error');
 
 });
+
+it.skip('should fail to  authenticate used token', async () => {
+
+  if (process.env.SINGLE_USE_TOKENS) {
+
+    expect.assertions(1);
+
+    const user = await User.create(fakeUser);
+
+    const token = user.generateToken();
+
+    await User.authenticateToken(token);
+
+    await expect(User.authenticateToken(token)).rejects.toEqual('Invalid Token');
+  }
+
+});
