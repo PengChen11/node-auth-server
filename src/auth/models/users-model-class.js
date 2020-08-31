@@ -51,10 +51,6 @@ class Users {
     return this.schema.findOne(query);
   }
 
-  // create(user){
-  //   let newUser = new this.schema(user);
-  //   return newUser.save();
-  // }
 }
 
 
