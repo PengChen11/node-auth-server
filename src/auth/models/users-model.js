@@ -5,17 +5,45 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const isEmail = require('validator').isEmail;
 
+const SINGLE_USE_TOKENS = false;// !!process.env.SINGLE_USE_TOKENS;
+const TOKEN_EXPIRE = process.env.TOKEN_EXPIRE || '60m';
+const SECRET = process.env.SECRET || 'supersecret';
+
+const usedTokens = new Set();
+
 const users = new mongoose.Schema({
   username: { type: String, requried: true, unique: true},
   password: { type: String, required: true},
+  fullname: { type: String },
   email: {type: String, validate: [ isEmail, 'invalid email' ]},
   role: { type: String, required: true, default: 'user', enum: ['admin', 'editor', 'user']},
+  capabilities: { type: Array, required: true, default: [] },
 });
 
 users.pre('save', async function(){
   if (this.isModified('password')){
     this.password = await bcrypt.hash(this.password, 5);
   }
+  let role = this.role;
+
+  if(this.isModified('role')) {
+
+    switch (role) {
+    case 'admin':
+      this.capabilities = ['create', 'read', 'update', 'delete'];
+      break;
+    case 'editor':
+      this.capabilities = ['create', 'read', 'update'];
+      break;
+    case 'writer':
+      this.capabilities = ['create', 'read'];
+      break;
+    case 'user':
+      this.capabilities = ['read'];
+      break;
+    }
+  }
+
 });
 
 
@@ -33,16 +61,22 @@ users.methods.comparePassword = function(plainPassword) {
     .catch(err=>console.error(err));
 };
 
-users.methods.tokenGenerator = function(){
-  let tokenData = {
+users.methods.generateToken = function (type) {
+
+  /* Lab 14 - add capabilities */
+  let token = {
     id: this._id,
-    username: this.username,
     role: this.role,
+    capabilities: this.capabilities,
   };
 
-  const signed = jwt.sign(tokenData, process.env.SECRET);
+  /* Additional Security Measure */
+  let options = {};
+  if (type !== 'key' && !!TOKEN_EXPIRE) {
+    options = { expiresIn: TOKEN_EXPIRE };
+  }
 
-  return signed;
+  return jwt.sign(token, SECRET, options);
 };
 
 users.methods.validation = function(username) {
@@ -75,20 +109,26 @@ users.statics.createFromOauth = async function(email){
 users.statics.authenticateToken = function (token) {
 
   /* Additional Security Measure */
-  // if (usedTokens.has(token)) {
-  //   return Promise.reject('Invalid Token');
-  // }
+  if (usedTokens.has(token)) {
+    console.log('unique fail');
+    return Promise.reject('Invalid Token');
+  }
 
-  let parsedToken = jwt.verify(token, process.env.SECRET);
+  try {
 
-  /* Additional Security Measure */
-  // Add to the scrap heap if we are in "one use token mode"
-  // if(SINGLE_USE_TOKENS) {
-  //   usedTokens.add(token);
-  // }
+    let parsedToken = jwt.verify(token, SECRET);
 
-  return this.findById(parsedToken.id);
+    /* Additional Security Measure */
+    (SINGLE_USE_TOKENS) && parsedToken.type !== 'key' && usedTokens.add(token);
 
+    let query = { _id: parsedToken.id };
+    return this.findOne(query);
+  } catch (e) { throw new Error('Invalid Token'); }
+
+};
+
+users.methods.generateKey = function () {
+  return this.generateToken('key');
 };
 
 
