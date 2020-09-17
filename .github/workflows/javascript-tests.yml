@@ -4,19 +4,6 @@ on: [push]
 
 jobs:
 
-  create-envfile:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Make envfile
-      uses: SpicyPizza/create-envfile@v1
-      with:
-        envkey_SECRET: ${{ secrets.SECRET }}
-        envkey_SINGLE_USE_TOKENS: ${{ secrets.SINGLE_USE_TOKENS}}
-        file_name: .env
-
-
   build:
 
     runs-on: ubuntu-latest
@@ -37,4 +24,6 @@ jobs:
         npm test
       env:
         CI: true
+        SECRET: ${{ secrets.SECRET }}
+        SINGLE_USE_TOKENS: ${{ secrets.SINGLE_USE_TOKENS}}
 
