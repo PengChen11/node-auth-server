@@ -2,15 +2,16 @@
 const  express = require('express');
 const app = express();
 
-// const AuthBase = require('./auth/middleware/basic');
-
-// const users = require('./auth/models/users-model');
 app.use(express.static('./public'));
 app.use(express.json());
 
 const router = require('./auth/router');
 
 app.use(router);
+
+const extraRoutes = require('./extra-routes');
+
+app.use(extraRoutes);
 
 const fourOfour = require('./middleware/404');
 

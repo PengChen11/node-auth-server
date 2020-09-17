@@ -1,58 +1,75 @@
 'use strict';
 
-require('dotenv').config();
 require('@code-fellows/supergoose');
-const auth = require('../src/auth/middleware/bearer');
+const bearerAuth = require('../src/auth/middleware/bearer');
+const User = require('../src/auth/models/users-model');
 
-it('should fail with missing headers', async () => {
-  let req = {
-    headers: {
-      authorization: '',
-    },
-  };
-
-  let res = {};
-
-  let next = jest.fn();
-
-  await auth(req, res, next);
-
-  expect(next).toHaveBeenCalledWith('Invalid Login: Missing Headers');
+afterEach(async () => {
+  await User.deleteMany({});
 });
 
-it('should fail with bad token', async () => {
-  let req = {
-    headers: {
-      authorization: 'Bearer bad.token.surely',
-    },
-  };
+const fakeUser = {
+  username: 'tester',
+  password: 'password',
+  role: 'admin',
+  email: 'tester@test.com',
+};
 
-  let res = {};
 
-  let next = jest.fn();
+describe('tests for bearer auth', ()=>{
 
-  await auth(req, res, next);
+  it('should fail with missing headers', async () => {
+    let req = {
+      headers: {
+        authorization: '',
+      },
+    };
 
-  expect(next).toHaveBeenCalledWith('Invalid Login');
-});
+    let res = {};
 
-it('should carry on with good token', async () => {
+    let next = jest.fn();
 
-  // Can be convenient to store a TEST_TOKEN in environment
-  // But you will have to refresh it (aka grab a new one) if/when it expires
+    await bearerAuth(req, res, next);
 
-  let req = {
-    headers: {
-      authorization: `Bearer ${process.env.TEST_TOKEN}`,
-    },
-  };
+    expect(next).toHaveBeenCalledWith('Invalid Login: Missing Headers');
+  });
 
-  let res = {};
 
-  let next = jest.fn();
+  it('should fail with bad token', async () => {
+    let req = {
+      headers: {
+        authorization: 'some made up token',
+      },
+    };
 
-  await auth(req, res, next);
+    let res = {};
 
-  expect(next).toHaveBeenCalledWith();
+    let next = jest.fn();
 
+    await bearerAuth(req, res, next);
+
+    expect(next).toHaveBeenCalledWith('Invalid Login');
+  });
+
+  it('should carry on with good token', async () => {
+
+    const user = await User.create(fakeUser);
+
+    const token = user.tokenGenerator();
+
+    let req = {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    };
+
+    let res = {};
+
+    let next = jest.fn();
+
+    await bearerAuth(req, res, next);
+
+    expect(next).toHaveBeenCalledWith();
+
+  });
 });

@@ -1,11 +1,11 @@
 'use strict';
 const express = require('express');
-const bearerAuthMiddleware = require('./auth/middleware/bearer');
+const bearerAuth = require('./auth/middleware/bearer');
 const router = express.Router();
 const permissions = require('./auth/middleware/acl.js');
 
 
-router.get('/secret', bearerAuthMiddleware, (req,res) => {
+router.get('/secret', bearerAuth, (req,res) => {
   res.status(200).send('access allowed');
 } );
 
@@ -22,11 +22,11 @@ router.get('/secret', bearerAuthMiddleware, (req,res) => {
 */
 
 router.get('/public', routeHandler);
-router.get('/private', bearerAuthMiddleware, routeHandler);
-router.get('/readonly', bearerAuthMiddleware, permissions('read'), routeHandler);
-router.post('/create', bearerAuthMiddleware, permissions('create'), routeHandler);
-router.put('/update', bearerAuthMiddleware, permissions('update'), routeHandler);
-router.delete('/delete', bearerAuthMiddleware, permissions('delete'), routeHandler);
+router.get('/private', bearerAuth, routeHandler);
+router.get('/readonly', bearerAuth, permissions('read'), routeHandler);
+router.post('/create', bearerAuth, permissions('create'), routeHandler);
+router.put('/update', bearerAuth, permissions('update'), routeHandler);
+router.delete('/delete', bearerAuth, permissions('delete'), routeHandler);
 
 function routeHandler(req, res) {
   res.status(200).send('Access Granted');
