@@ -1,4 +1,4 @@
-name: Create envfile
+name: Run Javascript Tests
 
 on: [push]
 
@@ -6,7 +6,7 @@ jobs:
 
   create-envfile:
 
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: Make envfile
@@ -15,11 +15,7 @@ jobs:
         SECRET: ${{ secrets.SECRET }}
         SINGLE_USE_TOKENS: ${{ secrets.SINGLE_USE_TOKENS}}
 
-name: Run Javascript Tests
 
-on: [push]
-
-jobs:
   build:
 
     runs-on: ubuntu-latest
