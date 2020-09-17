@@ -82,7 +82,7 @@ it('creating with missing email is an error', async () => {
 
 });
 
-it.skip('should fail to  authenticate used token', async () => {
+it('should fail to authenticate used token', async () => {
 
   if (process.env.SINGLE_USE_TOKENS) {
 
@@ -90,7 +90,7 @@ it.skip('should fail to  authenticate used token', async () => {
 
     const user = await User.create(fakeUser);
 
-    const token = user.generateToken();
+    const token = user.tokenGenerator();
 
     await User.authenticateToken(token);
 

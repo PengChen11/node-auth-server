@@ -3,20 +3,18 @@
 require('@code-fellows/supergoose');
 const auth = require('../src/auth/middleware/basic');
 const Users = require('../src/auth/models/users-model');
-process.env.SECRET = 'muysecreto';
 
 beforeAll(async (done) => {
   await new Users({username: 'admin', password: 'password', role: 'admin', email:'admin@admin.com'}).save();
   done();
 });
 
-describe('Auth Middleware', () => {
+describe('tests for basic auth', () => {
 
   let errorObject = {'message': 'Invalid User ID/Password', 'status': 401, 'statusMessage': 'Unauthorized'};
 
   describe('user authentication', () => {
 
-    let cachedToken; // in case you want to test reuse of token
 
     it('fails a login for a user (admin) with the incorrect basic credentials', async () => {
 
@@ -31,7 +29,7 @@ describe('Auth Middleware', () => {
 
       await auth(req, res, next);
 
-      expect(next).toHaveBeenCalledWith(errorObject); // Or perhaps 'Invalid Login', depends on what you choose
+      expect(next).toHaveBeenCalledWith(errorObject);
 
     });
 
@@ -46,8 +44,6 @@ describe('Auth Middleware', () => {
       let next = jest.fn();
 
       await auth(req,res,next);
-
-      // cachedToken = req.token;
 
       expect(next).toHaveBeenCalledWith();
 

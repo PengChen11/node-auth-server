@@ -1,3 +1,5 @@
+//this is a test to convert user model into class style
+
 'use strict';
 
 const mongoose = require('mongoose');

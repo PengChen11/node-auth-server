@@ -10,7 +10,7 @@ const supergoose = require('@code-fellows/supergoose');
 const mockRequest = supergoose(server);
 
 
-describe('Auth Router', () => {
+describe('Router tests', () => {
 
   describe(`users signup/in`, () => {
 

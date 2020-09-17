@@ -1,26 +1,42 @@
 
 'use strict';
 
-require('dotenv').config();
-
 const { server } = require('../src/server');
 
 const supergoose = require('@code-fellows/supergoose');
 
 const mockRequest = supergoose(server);
 
-it('should allow entry with good token', async () => {
-  // Can be convenient to store a TEST_TOKEN in environment
-  // But you will have to refresh it (aka grab a new one) if/when it expires
-  const response = await mockRequest.get('/secret').auth(process.env.TEST_TOKEN, {type: 'bearer'});
-  expect(response.status).toBe(200);
+const User = require('../src/auth/models/users-model');
+
+afterEach(async () => {
+  await User.deleteMany({});
 });
 
-it('should NOT allow entry with bad token', async () => {
-  // Can be convenient to store a TEST_TOKEN in environment
-  // But you will have to refresh it (aka grab a new one) if/when it expires
-  const response = await mockRequest.get('/secret').auth('bad token', {type: 'bearer'});
+const fakeUser = {
+  username: 'tester',
+  password: 'password',
+  role: 'admin',
+  email: 'tester@test.com',
+};
 
-  // STRETCH: respond with more appropriate status
-  expect(response.status).toBe(500);
+
+describe('tests for extra routes', ()=>{
+
+  it('should allow entry with good token', async () => {
+    const user = await User.create(fakeUser);
+
+    const token = user.tokenGenerator();
+
+    const response = await mockRequest.get('/secret').auth(token, {type: 'bearer'});
+    expect(response.status).toBe(200);
+  });
+
+  it('should NOT allow entry with bad token', async () => {
+
+    const response = await mockRequest.get('/secret').auth('bad token', {type: 'bearer'});
+
+    expect(response.status).toBe(500);
+  });
+
 });

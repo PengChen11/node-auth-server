@@ -4,8 +4,6 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const isEmail = require('validator').isEmail;
-
-const SINGLE_USE_TOKENS = false;// !!process.env.SINGLE_USE_TOKENS;
 const TOKEN_EXPIRE = process.env.TOKEN_EXPIRE || '60m';
 const SECRET = process.env.SECRET || 'supersecret';
 
@@ -61,7 +59,7 @@ users.methods.comparePassword = function(plainPassword) {
     .catch(err=>console.error(err));
 };
 
-users.methods.generateToken = function (type) {
+users.methods.tokenGenerator = function (type) {
 
   /* Lab 14 - add capabilities */
   let token = {
@@ -119,7 +117,7 @@ users.statics.authenticateToken = function (token) {
     let parsedToken = jwt.verify(token, SECRET);
 
     /* Additional Security Measure */
-    (SINGLE_USE_TOKENS) && parsedToken.type !== 'key' && usedTokens.add(token);
+    if (parsedToken.type !== 'key') usedTokens.add(token);
 
     let query = { _id: parsedToken.id };
     return this.findOne(query);
