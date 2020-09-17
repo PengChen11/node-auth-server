@@ -1,3 +1,20 @@
+name: Create envfile
+
+on: [push]
+
+jobs:
+
+  create-envfile:
+
+    runs-on: ubuntu-18.04
+
+    steps:
+    - name: Make envfile
+      uses: SpicyPizza/create-envfile@v1
+      with:
+        SECRET: ${{ secrets.SECRET }}
+        SINGLE_USE_TOKENS: ${{ secrets.SINGLE_USE_TOKENS}}
+
 name: Run Javascript Tests
 
 on: [push]
