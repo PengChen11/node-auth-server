@@ -12,8 +12,9 @@ jobs:
     - name: Make envfile
       uses: SpicyPizza/create-envfile@v1
       with:
-        SECRET: ${{ secrets.SECRET }}
-        SINGLE_USE_TOKENS: ${{ secrets.SINGLE_USE_TOKENS}}
+        envkey_SECRET: ${{ secrets.SECRET }}
+        envkey_SINGLE_USE_TOKENS: ${{ secrets.SINGLE_USE_TOKENS}}
+        file_name: .env
 
 
   build:
