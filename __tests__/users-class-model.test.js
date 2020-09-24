@@ -19,8 +19,8 @@ const fakeUser = {
 describe.skip('testing for user model class',()=>{
 
   it('should save hashed password', async () => {
-    // const user = await User.create(fakeUser).save();
-    const user = await User.create(fakeUser);
+    const user = await User.save(fakeUser);
+    // const user = await User.create(fakeUser);
     expect(user.username).toBe(fakeUser.username);
     expect(user.password).not.toBe(fakeUser.password);
   });

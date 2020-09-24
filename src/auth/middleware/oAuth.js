@@ -1,7 +1,6 @@
 'use strict';
 require('dotenv').config();
 const superagent = require('superagent');
-// const users = require('./users.js');
 const users = require('../models/users-model');
 
 /*
@@ -15,7 +14,7 @@ const API_SERVER = 'http://localhost:3000/oauth';
 const CLIENT_ID = process.env.GITHUB_OAUTH_ID;
 const CLIENT_SECRET = process.env.GITHUB_OAUTH_SECRET;
 
-module.exports = async function authorize(req, res, next) {
+module.exports = async (req, res, next) => {
 
   try {
     let code = req.query.code;
@@ -38,6 +37,7 @@ module.exports = async function authorize(req, res, next) {
 };
 
 async function exchangeCodeForToken(code) {
+
 
   let tokenResponse = await superagent.post(tokenServerUrl).send({
     code: code,

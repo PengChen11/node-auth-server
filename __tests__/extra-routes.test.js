@@ -2,11 +2,8 @@
 'use strict';
 
 const { server } = require('../src/server');
-
 const supergoose = require('@code-fellows/supergoose');
-
 const mockRequest = supergoose(server);
-
 const User = require('../src/auth/models/users-model');
 
 afterEach(async () => {
@@ -28,13 +25,13 @@ describe('tests for extra routes', ()=>{
 
     const token = user.tokenGenerator();
 
-    const response = await mockRequest.get('/secret').auth(token, {type: 'bearer'});
+    const response = await mockRequest.get('/api/v2/secret').auth(token, {type: 'bearer'});
     expect(response.status).toBe(200);
   });
 
   it('should NOT allow entry with bad token', async () => {
 
-    const response = await mockRequest.get('/secret').auth('bad token', {type: 'bearer'});
+    const response = await mockRequest.get('/api/v2/secret').auth('bad token', {type: 'bearer'});
 
     expect(response.status).toBe(500);
   });
