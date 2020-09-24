@@ -44,10 +44,7 @@ function handleSignin(req, res, next){
 
 router.post('/signup', handleSignUp);
 router.post('/signin', basicAuth, handleSignin);
-// router.get('/users',(req,res)=>{
-//   users.find({})
-//     .then(results => res.json(results));
-// });
+
 router.get('/oauth', oAuth, (req, res)=>{
   res.status(200).send(req.token);
 });

@@ -14,7 +14,7 @@ const users = new mongoose.Schema({
   password: { type: String, required: true},
   fullname: { type: String },
   email: {type: String, validate: [ isEmail, 'invalid email' ]},
-  role: { type: String, required: true, default: 'user', enum: ['admin', 'editor', 'user']},
+  role: { type: String, required: true, default: 'user', enum: ['admin', 'editor', 'user', 'writer']},
   capabilities: { type: Array, required: true, default: [] },
 });
 

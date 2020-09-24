@@ -3,10 +3,8 @@
 process.env.SECRET = 'wocaowocao';
 
 const jwt = require('jsonwebtoken');
-
 const server = require('../src/server').server;
 const supergoose = require('@code-fellows/supergoose');
-
 const mockRequest = supergoose(server);
 
 
@@ -23,7 +21,6 @@ describe('Router tests', () => {
       const token = await jwt.verify(results.text, process.env.SECRET);
 
       expect(token.id).toBeDefined();
-      // expect(results.text).toBe('a');
 
     });
 
@@ -39,6 +36,11 @@ describe('Router tests', () => {
 
       expect(token).toBeDefined();
 
+    });
+
+    it('can get 404 error for non exsiting route', async ()=>{
+      const badReq = await mockRequest.get('/bad_route');
+      expect(badReq.status).toBe(404);
     });
 
   });

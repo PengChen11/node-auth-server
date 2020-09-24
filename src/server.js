@@ -9,9 +9,9 @@ const router = require('./auth/router');
 
 app.use(router);
 
-const extraRoutes = require('./extra-routes');
+const extraRoutes = require('./v2_routes');
 
-app.use(extraRoutes);
+app.use('/api/v2', extraRoutes);
 
 const fourOfour = require('./middleware/404');
 
@@ -20,8 +20,6 @@ app.use('*', fourOfour);
 const errors = require('./middleware/error');
 
 app.use(errors);
-
-
 
 module.exports = {
   server: app,
