@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 
 const server = require('./src/server');
 
+// const MONGODB_URL = 'mongodb://localhost:27017/auth-server';
 const MONGODB_URL = process.env.DB_URL;
 
 const mongooseOptions = {
