@@ -15,6 +15,11 @@ app.use('/api/v2', extraRoutes);
 
 const fourOfour = require('./middleware/404');
 
+app.get('/testing', (req,res,next)=>{
+  throw new Error('Something went wrong!');
+  // res.send('hello, this is the test route');
+});
+
 app.use('*', fourOfour);
 
 const errors = require('./middleware/error');
