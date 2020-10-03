@@ -7,7 +7,16 @@ const server = require('../src/server').server;
 const supergoose = require('@code-fellows/supergoose');
 const mockRequest = supergoose(server);
 
+// afterEach(async () => {
+//   await User.deleteMany({});
+// });
 
+// const fakeUser = {
+//   username: 'tester',
+//   password: 'password',
+//   role: 'admin',
+//   email: 'tester@test.com',
+// };
 describe('Router tests', () => {
 
   describe(`users signup/in`, () => {
@@ -43,6 +52,13 @@ describe('Router tests', () => {
       expect(badReq.status).toBe(404);
     });
 
+    it('can not use exsiting user info to sign up', async ()=>{
+      const userData = { username: 'admin', password: 'password', role: 'admin', email: 'admin@admin.com' };
+
+      const results = await mockRequest.post('/signup').send(userData);
+
+      expect(results.status).toBe(403);
+    });
   });
 
 

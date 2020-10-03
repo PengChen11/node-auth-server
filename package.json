@@ -15,8 +15,11 @@
     "type": "git",
     "url": "git+https://github.com/PengChen11/node-auth-server.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "auth",
+    "heroku"
+  ],
+  "author": "Peng Chen",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/PengChen11/node-auth-server/issues"
@@ -34,5 +37,8 @@
   "devDependencies": {
     "@code-fellows/supergoose": "^1.0.11",
     "jest": "^26.4.2"
+  },
+  "engines": {
+    "node": "14.x"
   }
 }
