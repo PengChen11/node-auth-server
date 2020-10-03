@@ -15,11 +15,6 @@ app.use('/api/v2', extraRoutes);
 
 const fourOfour = require('./middleware/404');
 
-app.get('/testing', (req,res,next)=>{
-  throw new Error('Something went wrong!');
-  // res.send('hello, this is the test route');
-});
-
 app.use('*', fourOfour);
 
 const errors = require('./middleware/error');
@@ -29,7 +24,7 @@ app.use(errors);
 module.exports = {
   server: app,
   start: port => {
-    let PORT = port || process.env.PORT || 3200;
+    let PORT = process.env.PORT || 3000;
     app.listen(PORT, ()=> console.log(`listening on port ${PORT}`));
 
   },
